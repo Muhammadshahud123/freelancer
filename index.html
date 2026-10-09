@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProposalCraft — Premium Freelancer Proposal & Contract Generator</title>
+    <!-- Favicon (matches header brand logo) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='g'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%234f46e5'/%3E%3Cstop%20offset='100%25'%20stop-color='%2381a4f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='64'%20height='64'%20rx='16'%20fill='url(%23g)'/%3E%3Cpath%20d='M20%2014h16l8%208v28a2%202%200%2001-2%202H20a2%202%200%2001-2-2V16a2%202%200%20012-2z'%20fill='%23ffffff'%20fill-opacity='0.95'/%3E%3Cpath%20d='M36%2014v8h8z'%20fill='%23c7d2fe'/%3E%3Cpath%20d='M22%2036c3-4%205-4%207-1s4%203%207-1%205-4%207-1'%20stroke='%234f46e5'%20stroke-width='2.2'%20fill='none'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cline%20x1='22'%20y1='44'%20x2='42'%20y2='44'%20stroke='%234f46e5'%20stroke-width='2.2'%20stroke-linecap='round'/%3E%3C/svg%3E">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        accent: {
+                            gold: '#d97706',
+                            emerald: '#10b981',
+                            darkBg: '#0f172a',
+                            cardDark: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- jsPDF Library for Premium Client-side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Canvas Confetti for Celebration Feedback -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Custom styles for flawless visual elements */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .gradient-bg {
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+        }
+        /* Custom PDF-like styling inside the preview container */
+        .preview-paper {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            min-height: 800px;
+        }
+        /* Hide scrollbars for crisp UI views */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Navigation transition states */
+        .page-view {
+            display: none;
+        }
+        .page-view.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col gradient-bg">
+
+    <!-- Global Glassmorphic Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchPage('home')">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                    <i class="fa-solid fa-file-signature text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 dark:from-brand-400 dark:to-indigo-300 bg-clip-text text-transparent">ProposalCraft</span>
+                    <span class="block text-[9px] uppercase tracking-widest font-semibold text-slate-400 dark:text-slate-500">Aptech Vision 2026</span>
+                </div>
+            </div>
+
+            <!-- Sleek Tab Navigation Links -->
+            <nav class="hidden lg:flex space-x-1 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl">
+                <button onclick="switchPage('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-white shadow-sm">Home</button>
+                <button onclick="switchPage('generator')" id="nav-generator" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Generator Tool</button>
+                <button onclick="switchPage('challenges')" id="nav-challenges" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Problem & Solution</button>
+                <button onclick="switchPage('features')" id="nav-features" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Key Features</button>
+                <button onclick="switchPage('techstack')" id="nav-techstack" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">Tech Stack</button>
+            </nav>
+
+            <!-- Utility Controls (Theme Toggle + CTA) -->
+            <div class="flex items-center space-x-4">
+                <!-- Theme Switcher -->
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Theme">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <!-- Quick Tool Launch CTA -->
+                <button onclick="switchPage('generator')" class="hidden sm:flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-lg shadow-brand-500/15 transition-all hover:scale-[1.02]">
+                    <span>Start Generator</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Menu">
+                    <i id="mobile-menu-icon" class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Panel -->
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
+            <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col space-y-1">
+                <button onclick="switchPage('home'); closeMobileMenu();" class="nav-btn-mobile px-4 py-3 rounded-lg text-sm font-medium text-left text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Home</button>
+                <button onclick="switchPage('generator'); closeMobileMenu();" class="nav-btn-mobile px-4 py-3 rounded-lg text-sm font-medium text-left text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Generator Tool</button>
+                <button onclick="switchPage('challenges'); closeMobileMenu();" class="nav-btn-mobile px-4 py-3 rounded-lg text-sm font-medium text-left text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Problem & Solution</button>
+                <button onclick="switchPage('features'); closeMobileMenu();" class="nav-btn-mobile px-4 py-3 rounded-lg text-sm font-medium text-left text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Key Features</button>
+                <button onclick="switchPage('techstack'); closeMobileMenu();" class="nav-btn-mobile px-4 py-3 rounded-lg text-sm font-medium text-left text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Tech Stack</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Dynamic Container -->
+    <main class="flex-grow">
+
+        <!-- SECTION 1: HOME PAGE -->
+        <section id="page-home" class="page-view active max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+            <!-- Hero Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                <div class="lg:col-span-7 space-y-6 sm:space-y-8 text-left">
+                    <div class="inline-flex items-center space-x-2 bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800 px-4 py-1.5 rounded-full">
+                        <span class="flex h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
+                        <span class="text-xs font-semibold text-brand-700 dark:text-brand-300 tracking-wide uppercase">Aptech Vision 2026 Submission Project</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                        Generate Professional Proposals & Contracts in Under 2 Minutes
+                    </h1>
+                    <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                        A modern static utility built specifically for freelancers to structure high-impact design, coding, content, or marketing proposals coupled with robust commercial agreements. Fill in details, customize parameters, and download print-ready PDFs.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                        <button onclick="switchPage('generator')" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow-xl shadow-brand-500/20 hover:shadow-brand-500/30 transition-all hover:translate-y-[-2px] flex items-center justify-center">
+                            <i class="fa-solid fa-bolt mr-2 text-amber-400"></i> Open Generator Tool
+                        </button>
+                        <button onclick="switchPage('challenges')" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 font-bold text-lg transition-all flex items-center justify-center">
+                            Problem & Solution
+                        </button>
+                    </div>
+                    <!-- Quick Specs Row -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-slate-200 dark:border-slate-800 max-w-xl">
+                        <div>
+                            <span class="block text-2xl sm:text-3xl font-black text-brand-600 dark:text-brand-400">2 Min</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Creation Time</span>
+                        </div>
+                        <div class="border-l border-slate-200 dark:border-slate-800 pl-4">
+                            <span class="block text-2xl sm:text-3xl font-black text-brand-600 dark:text-brand-400">100%</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Static & Free</span>
+                        </div>
+                        <div class="border-l border-slate-200 dark:border-slate-800 pl-4">
+                            <span class="block text-2xl sm:text-3xl font-black text-brand-600 dark:text-brand-400">∞</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Reusable Exports</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Interactive Mini Tool Mockup -->
+                <div class="lg:col-span-5 relative">
+                    <div class="absolute -inset-1 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-3xl blur-xl opacity-20 dark:opacity-40"></div>
+                    <div class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center space-x-2">
+                                <span class="h-3 w-3 rounded-full bg-red-400"></span>
+                                <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+                                <span class="h-3 w-3 rounded-full bg-green-400"></span>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Real-time Form Mockup</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Freelancer Identity</label>
+                                <input type="text" readonly value="Arsalan Shah" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-xl px-4 py-2 text-xs text-slate-600 dark:text-slate-300 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Target Client Representative</label>
+                                <input type="text" readonly value="Apex Global Corp — Enterprise CRM Portal" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-xl px-4 py-2 text-xs text-slate-600 dark:text-slate-300 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Legal Agreement Framework</label>
+                                <div class="flex items-center space-x-2 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 p-2 rounded-lg text-[11px] text-emerald-700 dark:text-emerald-400">
+                                    <i class="fa-solid fa-check-double"></i>
+                                    <span>Standard Payment Protection Terms Enabled</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="switchPage('generator')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-sm tracking-wide transition-colors flex items-center justify-center space-x-2">
+                            <span>Launch Application Tool</span>
+                            <i class="fa-solid fa-arrow-pointer text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Calculator Feature -->
+            <div class="mt-20 sm:mt-24 p-6 sm:p-12 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                            Evaluate Your Saved Resource Value
+                        </h2>
+                        <p class="mt-4 text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed">
+                            Drafting professional proposals and contracts manually takes up to 2 hours of valuable work time per client. Slide the metrics below to measure your efficiency gain!
+                        </p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-950 p-6 sm:p-8 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-xl space-y-5">
+                        <div>
+                            <div class="flex justify-between text-xs sm:text-sm font-semibold mb-2">
+                                <span class="text-slate-500 dark:text-slate-400">Proposals Created / Month</span>
+                                <span id="calc-count-val" class="text-brand-600 dark:text-brand-400 font-extrabold">10 Proposals</span>
+                            </div>
+                            <input id="calc-count" type="range" min="2" max="50" value="10" oninput="calculateSavings()" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs sm:text-sm font-semibold mb-2">
+                                <span class="text-slate-500 dark:text-slate-400">Average Hourly Billing Rate</span>
+                                <span id="calc-rate-val" class="text-brand-600 dark:text-brand-400 font-extrabold">$40 / hr</span>
+                            </div>
+                            <input id="calc-rate" type="range" min="15" max="200" value="40" oninput="calculateSavings()" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div>
+                                <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Time Saved Yearly</span>
+                                <span id="saved-hours" class="text-xl sm:text-2xl font-black text-brand-600 dark:text-brand-400">220 Hours</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Value Reclaimed</span>
+                                <span id="saved-money" class="text-xl sm:text-2xl font-black text-accent-emerald">$8,800 / yr</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: GENERATOR TOOL (THE ENGINE) -->
+        <section id="page-generator" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left Hand Form Editor Card -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+                    <!-- Form Header & Progress Indicators -->
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold uppercase tracking-widest text-brand-600 dark:text-brand-400">Proposal & Contract Wizard</span>
+                            <span id="step-indicator" class="text-xs font-semibold text-slate-400 bg-slate-200 dark:bg-slate-800 px-2.5 py-1 rounded-md">Step 1 of 5</span>
+                        </div>
+                        <!-- Wizard Visual Dots -->
+                        <div class="flex items-center space-x-2">
+                            <div id="dot-1" class="h-1.5 flex-1 bg-brand-600 rounded-full transition-all duration-300"></div>
+                            <div id="dot-2" class="h-1.5 flex-1 bg-slate-200 dark:bg-slate-800 rounded-full transition-all duration-300"></div>
+                            <div id="dot-3" class="h-1.5 flex-1 bg-slate-200 dark:bg-slate-800 rounded-full transition-all duration-300"></div>
+                            <div id="dot-4" class="h-1.5 flex-1 bg-slate-200 dark:bg-slate-800 rounded-full transition-all duration-300"></div>
+                            <div id="dot-5" class="h-1.5 flex-1 bg-slate-200 dark:bg-slate-800 rounded-full transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 Form Container: Freelancer Details -->
+                    <div id="step-content-1" class="p-6 space-y-4 form-step-view">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><i class="fa-solid fa-user-tie text-brand-500"></i> Freelancer Profile Info</h2>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Full Name</label>
+                                <input type="text" id="f-name" value="Sarmad Khan" oninput="updateLivePreview()" placeholder="e.g. Sarmad Khan" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Professional Domain</label>
+                                <input type="text" id="f-title" value="Creative UI/UX & Brand Designer" oninput="updateLivePreview()" placeholder="e.g. Senior Frontend Developer" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Professional Email</label>
+                                <input type="email" id="f-email" value="hello@sarmaddesigns.com" oninput="updateLivePreview()" placeholder="e.g. contact@freelancer.com" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 Form Container: Client & Proposal Scope -->
+                    <div id="step-content-2" class="p-6 space-y-4 form-step-view hidden">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><i class="fa-solid fa-bullseye text-brand-500"></i> Client & Project Target</h2>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Client Representative Name & Company</label>
+                                <input type="text" id="c-name" value="Michael Vance, CEO of Horizon Corp" oninput="updateLivePreview()" placeholder="e.g. Michael Vance" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Project Scope Title</label>
+                                <input type="text" id="p-title" value="Enterprise Corporate Website Redesign" oninput="updateLivePreview()" placeholder="e.g. E-Commerce Redesign" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Brief Proposal Description</label>
+                                <textarea id="p-desc" rows="3" oninput="updateLivePreview()" placeholder="Write a brief overview of the project objectives..." class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">We will transform the digital footprint of Horizon Corp by engineering an intuitive, high-speed, and SEO optimized web portal structured to boost professional lead capture.</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 Form Container: Deliverables & Milestones -->
+                    <div id="step-content-3" class="p-6 space-y-4 form-step-view hidden">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><i class="fa-solid fa-dollar-sign text-brand-500"></i> Budgeting & Milestones</h2>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Total Fixed Budget ($)</label>
+                                <input type="text" id="p-price" value="5,800" oninput="updateLivePreview()" placeholder="e.g. 5,000" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Project Final Deadline</label>
+                                <input type="text" id="p-deadline" value="6 Weeks From Commencement" oninput="updateLivePreview()" placeholder="e.g. July 15, 2026" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <!-- Dynamic Scope Items List -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Key Execution Deliverables</label>
+                                <div id="scope-items-container" class="space-y-2">
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" value="UI UX Research & Interactive Wireframes" oninput="updateLivePreview()" class="scope-input flex-grow bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500">
+                                        <button onclick="removeScopeItem(this)" class="p-2 text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" value="Modern Visual Mockups & Dynamic Prototypes" oninput="updateLivePreview()" class="scope-input flex-grow bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500">
+                                        <button onclick="removeScopeItem(this)" class="p-2 text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" value="Comprehensive Asset Handoff & Launch Support" oninput="updateLivePreview()" class="scope-input flex-grow bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500">
+                                        <button onclick="removeScopeItem(this)" class="p-2 text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                                    </div>
+                                </div>
+                                <button onclick="addScopeItem()" class="mt-2 text-xs font-bold text-brand-600 hover:text-brand-700 dark:text-brand-400 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-circle-plus"></i>
+                                    <span>Add Project Phase</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 Form Container: Contract & Legal Terms (NEW CONTRACT SECTION) -->
+                    <div id="step-content-4" class="p-6 space-y-4 form-step-view hidden">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><i class="fa-solid fa-gavel text-brand-500"></i> Contract & Terms Agreement</h2>
+                        
+                        <div class="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 p-4 rounded-xl space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-extrabold text-indigo-950 dark:text-indigo-300 uppercase tracking-wider">Include Formal Contract Agreement</label>
+                                <input type="checkbox" id="contract-toggle" checked onchange="toggleContractPreview(); updateLivePreview();" class="h-4.5 w-4.5 rounded text-brand-600 focus:ring-brand-500 border-slate-300">
+                            </div>
+                            <p class="text-[11px] text-indigo-900/70 dark:text-indigo-400/85">Checking this adds a legally binding contract agreement section on page 2 of your generated document complete with customized protection terms.</p>
+                        </div>
+
+                        <div id="contract-inputs-wrapper" class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Governing Law / State Jurisdiction</label>
+                                <input type="text" id="contract-jurisdiction" value="Karachi, Sindh, Pakistan" oninput="updateLivePreview()" placeholder="e.g. Karachi, Sindh, Pakistan" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Payment Schedule Clause</label>
+                                <input type="text" id="contract-payment" value="50% upfront retainer advance, 50% upon final delivery handover" oninput="updateLivePreview()" placeholder="e.g. 50% advance, 50% upon delivery" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Intellectual Property Clause</label>
+                                <select id="contract-ip" onchange="updateLivePreview()" class="w-full bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                                    <option value="transferred" selected>Full ownership transfers to Client upon receipt of final invoice payment</option>
+                                    <option value="shared">Joint ownership - Freelancer maintains promotional use rights</option>
+                                    <option value="retained">Freelancer retains original work system copyrights, licensing usage only</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 Form Container: Template Choice -->
+                    <div id="step-content-5" class="p-6 space-y-4 form-step-view hidden">
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Visual Theme Selection</h2>
+                        <div class="grid grid-cols-1 gap-3">
+                            <!-- Template Option 1 -->
+                            <div onclick="selectTemplate('minimal')" class="template-choice border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-900/10 p-4 rounded-xl cursor-pointer hover:border-brand-500 transition-all flex items-center space-x-4">
+                                <div class="h-5 w-5 rounded-full border-4 border-brand-600 flex items-center justify-center bg-white"></div>
+                                <div class="flex-grow">
+                                    <span class="block text-sm font-bold text-slate-900 dark:text-white">Corporate Blue Minimal</span>
+                                    <span class="block text-xs text-slate-400">Crisp, professional high-contrast business aesthetic</span>
+                                </div>
+                            </div>
+                            <!-- Template Option 2 -->
+                            <div onclick="selectTemplate('obsidian')" class="template-choice border border-slate-200 dark:border-slate-800 p-4 rounded-xl cursor-pointer hover:border-brand-500 transition-all flex items-center space-x-4">
+                                <div class="h-5 w-5 rounded-full border-2 border-slate-300 flex items-center justify-center bg-white"></div>
+                                <div class="flex-grow">
+                                    <span class="block text-sm font-bold text-slate-900 dark:text-white">Obsidian Technical Dark</span>
+                                    <span class="block text-xs text-slate-400">Excellent representation for programmers, engineers, and tech startups</span>
+                                </div>
+                            </div>
+                            <!-- Template Option 3 -->
+                            <div onclick="selectTemplate('gold')" class="template-choice border border-slate-200 dark:border-slate-800 p-4 rounded-xl cursor-pointer hover:border-brand-500 transition-all flex items-center space-x-4">
+                                <div class="h-5 w-5 rounded-full border-2 border-slate-300 flex items-center justify-center bg-white"></div>
+                                <div class="flex-grow">
+                                    <span class="block text-sm font-bold text-slate-900 dark:text-white">Prestige Gold Executive</span>
+                                    <span class="block text-xs text-slate-400">Warm hues perfect for elite agencies, consultancies, and copywriters</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wizard Control Footer -->
+                    <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <button id="prev-btn" onclick="wizardStep(-1)" disabled class="px-4 py-2 text-sm font-bold rounded-xl text-slate-400 dark:text-slate-500 cursor-not-allowed transition-colors">Back</button>
+                        <button id="next-btn" onclick="wizardStep(1)" class="px-5 py-2.5 text-sm font-bold rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white transition-colors flex items-center space-x-1.5">
+                            <span>Next Step</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Hand Live Preview Container -->
+                <div class="lg:col-span-7 flex flex-col space-y-4">
+                    <!-- Actions Header above paper -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-md">
+                        <div class="flex items-center space-x-2">
+                            <span class="inline-flex h-2.5 w-2.5 rounded-full bg-accent-emerald animate-ping"></span>
+                            <span class="text-sm font-extrabold text-slate-500 dark:text-slate-400">Active Real-Time Preview</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="downloadProposalPDF()" class="px-5 py-2.5 bg-gradient-to-r from-accent-emerald to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-teal-500/10 transition-all hover:scale-[1.02]">
+                                <i class="fa-solid fa-file-arrow-down mr-1.5"></i> Download PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Preview Wrapper -->
+                    <div class="overflow-x-auto w-full no-scrollbar">
+                        <div id="live-proposal-preview" class="preview-paper w-full min-w-[550px] bg-white text-slate-900 rounded-2xl border border-slate-200 p-8 sm:p-12 flex flex-col justify-between transition-all duration-300">
+                            
+                            <!-- PAGE 1: PROPOSAL INFO -->
+                            <div class="space-y-8">
+                                <div class="flex justify-between items-start border-b pb-6 border-slate-100">
+                                    <div class="space-y-1">
+                                        <span id="preview-logo-badge" class="inline-block text-xs font-black bg-brand-600 text-white px-3 py-1.5 rounded uppercase tracking-widest mb-2">Proposal Draft</span>
+                                        <h3 id="preview-f-name" class="text-2xl font-black tracking-tight text-slate-900">Sarmad Khan</h3>
+                                        <p id="preview-f-title" class="text-xs font-bold uppercase tracking-widest text-brand-600">Creative UI/UX & Brand Designer</p>
+                                    </div>
+                                    <div class="text-right text-xs space-y-1 text-slate-400">
+                                        <p>Proposal Term: Vision 2026</p>
+                                        <p id="preview-f-email">hello@sarmaddesigns.com</p>
+                                        <p>Verified Secure Client Export</p>
+                                    </div>
+                                </div>
+
+                                <!-- Project Representative Scope -->
+                                <div class="space-y-3">
+                                    <div class="space-y-1">
+                                        <span class="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Prepared Exclusively For</span>
+                                        <h4 id="preview-c-name" class="text-base font-bold text-slate-800">Michael Vance, CEO of Horizon Corp</h4>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <span class="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Project Overview</span>
+                                        <h1 id="preview-p-title" class="text-2xl font-black tracking-tight text-slate-900 leading-tight">Enterprise Corporate Website Redesign</h1>
+                                        <p id="preview-p-desc" class="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-xl">We will transform the digital footprint of Horizon Corp by engineering an intuitive, high-speed, and SEO optimized web portal structured to boost professional lead capture.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Scope and Deliverables List -->
+                                <div class="space-y-3">
+                                    <span class="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Execution Framework Phases</span>
+                                    <ul id="preview-scope-list" class="space-y-2">
+                                        <!-- Rendered dynamically -->
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Commercial Parameters Footnote -->
+                            <div class="pt-6 border-t border-slate-100 flex justify-between items-center mt-6">
+                                <div class="space-y-1">
+                                    <span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Target Timeline</span>
+                                    <span id="preview-p-deadline" class="text-xs sm:text-sm font-extrabold text-slate-800">6 Weeks From Commencement</span>
+                                </div>
+                                <div class="text-right space-y-1">
+                                    <span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Estimated Total Investment</span>
+                                    <span id="preview-p-price" class="text-lg sm:text-2xl font-black text-brand-600">$5,800 USD</span>
+                                </div>
+                            </div>
+
+                            <!-- PAGE 2 PREVIEW: THE LEGAL AGREEMENT CONTRACT SECTION -->
+                            <div id="preview-contract-section" class="mt-12 pt-8 border-t-2 border-dashed border-slate-200 dark:border-slate-700 space-y-6">
+                                <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-xl border border-slate-100 dark:border-slate-800 space-y-4">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fa-solid fa-gavel text-brand-500"></i>
+                                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Formal Commercial Terms Agreement</h3>
+                                    </div>
+                                    <div class="space-y-3 text-[11px] text-slate-500 leading-relaxed">
+                                        <p>
+                                            <strong>1. Scope & Execution:</strong> The Freelancer agrees to perform development, consulting, and design objectives highlighted under the "Execution Framework Phases".
+                                        </p>
+                                        <p>
+                                            <strong>2. Billing Schedule:</strong> Payment for this contract shall match the following schedule: <span id="preview-contract-payment" class="font-semibold text-slate-800">50% upfront retainer advance, 50% upon final delivery handover</span>.
+                                        </p>
+                                        <p>
+                                            <strong>3. Intellectual Property:</strong> <span id="preview-contract-ip" class="font-semibold text-slate-800">Full ownership transfers to Client upon receipt of final invoice payment</span>. Original background tooling remains freelancer resource asset.
+                                        </p>
+                                        <p>
+                                            <strong>4. Settlement of Disputes:</strong> This commercial framework shall be governed, managed, and executed under the local law guidelines of the jurisdiction of <span id="preview-contract-jurisdiction" class="font-semibold text-slate-800">Karachi, Sindh, Pakistan</span>.
+                                        </p>
+                                    </div>
+                                    <!-- Signature placeholders -->
+                                    <div class="grid grid-cols-2 gap-6 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
+                                        <div class="space-y-1">
+                                            <div class="border-b border-slate-400 h-10 w-full"></div>
+                                            <span class="block text-[8px] uppercase tracking-wider text-slate-400">Provider Signature</span>
+                                            <span id="preview-sig-f" class="block text-[11px] font-extrabold text-slate-950">Sarmad Khan</span>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <div class="border-b border-slate-400 h-10 w-full"></div>
+                                            <span class="block text-[8px] uppercase tracking-wider text-slate-400">Client Representative Signature</span>
+                                            <span id="preview-sig-c" class="block text-[11px] font-extrabold text-slate-950">Michael Vance</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: CHALLENGES & SOLUTION -->
+        <section id="page-challenges" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+            <!-- Problem Statement & Solution Cover -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+                <!-- Pain Points Side -->
+                <div class="bg-red-50/50 dark:bg-red-950/10 border border-red-100 dark:border-red-900/30 p-8 sm:p-12 rounded-3xl space-y-6 sm:space-y-8">
+                    <div class="h-12 w-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400">
+                        <i class="fa-solid fa-circle-exclamation text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-widest block mb-2">01 | Problem Statement</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">The Struggle Freelancers Face Daily</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">📁</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Finding a Template</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Opening legacy editors, searching for old versions, copy-pasting raw content and repeatedly breaking columns layout.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">✍️</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Writing from Scratch</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Manually retyping basic objectives, standard deliverables, specific costs, and deadlines. Consumes up to 1-2 hours.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">😩</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Formatting Issues</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Final compiled documents lack proper alignment, standard branding, and professional typography, resulting in a cheap appearance.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">📤</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Last-Minute Edits</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Discovering pricing errors directly before sharing. Delays client response, affecting critical first impression value.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proposed Solution Side -->
+                <div class="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100 dark:border-emerald-900/30 p-8 sm:p-12 rounded-3xl space-y-6 sm:space-y-8">
+                    <div class="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <i class="fa-solid fa-circle-check text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-2">02 | Proposed Solution</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">ProposalCraft Instant Integration Engine</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">⚡</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Unmatched Performance Speed</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Fill an structured form layout and compile your professional agreement in less than 2 minutes flat.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">🎨</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Agency Quality Designs</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Receive beautifully constructed, high-converting visual templates without requiring expert visual design skills.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">🔓</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Uncompromised Access</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Entirely free utility without hidden payment limits or account signup constraints. Instant use anytime, anywhere.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-xl shrink-0 mt-1">🔒</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Secure Privacy-First Compilation</h3>
+                                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Runs entirely on raw front-end script elements. Your customer lists and billing data are never dispatched to a remote database.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Visual Workflow Step Map (PPT 03: How It Works) -->
+            <div class="space-y-12">
+                <div class="text-center max-w-3xl mx-auto space-y-4">
+                    <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">03 | HOW IT WORKS</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">The Modern 4-Step Process</h2>
+                    <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400">Create client-ready documents with professional legal terms through four clean workflow stages.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl relative">
+                        <span class="absolute top-4 right-4 text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded">Step 01</span>
+                        <div class="h-10 w-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 mb-4"><i class="fa-solid fa-keyboard"></i></div>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Provide Details</h3>
+                        <p class="text-xs text-slate-500 mt-2">Enter your identity, client details, specific budget parameters, and final deliverable timelines.</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl relative">
+                        <span class="absolute top-4 right-4 text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded">Step 02</span>
+                        <div class="h-10 w-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 mb-4"><i class="fa-solid fa-eye"></i></div>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Live System Preview</h3>
+                        <p class="text-xs text-slate-500 mt-2">Observe your output layout automatically adapt as you interact with the form editor blocks.</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl relative">
+                        <span class="absolute top-4 right-4 text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded">Step 03</span>
+                        <div class="h-10 w-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 mb-4"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Select Style Themes</h3>
+                        <p class="text-xs text-slate-500 mt-2">Toggle between clean Corporate Blue, Technical Obsidian, or prestige Gold layouts instantly.</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl relative">
+                        <span class="absolute top-4 right-4 text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded">Step 04</span>
+                        <div class="h-10 w-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 mb-4"><i class="fa-solid fa-file-arrow-down"></i></div>
+                        <h3 class="font-bold text-slate-900 dark:text-white">Local Vector Export</h3>
+                        <p class="text-xs text-slate-500 mt-2">Render and download the document as a vector PDF instantly, ready for signature verification.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: KEY FEATURES (PPT 04) -->
+        <section id="page-features" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">04 | CORE KEY FEATURES</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Comprehensive Functional Ecosystem</h2>
+                <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400">Everything needed to compile professional client documentation offline.</p>
+            </div>
+
+            <!-- Grid Layout of High-Fidelity Features -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:border-brand-500 transition-all duration-300">
+                    <div class="h-12 w-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 mb-6">
+                        <i class="fa-solid fa-list-check text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Multi-Step Form Guide</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
+                        A structured wizard to prevent cognitive overload. Split your target identity, scope deliverables, payment schedules, and legal clauses into logical parts.
+                    </p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:border-brand-500 transition-all duration-300">
+                    <div class="h-12 w-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-accent-emerald mb-6">
+                        <i class="fa-solid fa-display text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Live Document Preview</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
+                        Instant render mechanics present exact visual structure adjustments as you type, ensuring errors are fixed before downloading.
+                    </p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:border-brand-500 transition-all duration-300">
+                    <div class="h-12 w-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-accent-gold mb-6">
+                        <i class="fa-solid fa-gavel text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Integrated Contract Clauses</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
+                        Toggle and customize contract parameters (governing law, IP, payments) to ensure your professional interests remain secure in every project.
+                    </p>
+                </div>
+                <!-- Card 4 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:border-brand-500 transition-all duration-300">
+                    <div class="h-12 w-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6">
+                        <i class="fa-solid fa-file-pdf text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Local Offline Export</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
+                        Uses vector jsPDF script modules to compile clean multi-page document PDFs with zero external server dependencies, protecting your data.
+                    </p>
+                </div>
+                <!-- Card 5 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:border-brand-500 transition-all duration-300">
+                    <div class="h-12 w-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-6">
+                        <i class="fa-solid fa-moon text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Universal Theme Support</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
+                        Includes a native system dark/light switch, making formatting tasks comfortable in high or low-light work environments.
+                    </p>
+                </div>
+                <!-- Card 6 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-2xl hover:border-brand-500 transition-all duration-300">
+                    <div class="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 mb-6">
+                        <i class="fa-solid fa-server text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Zero Server Dependencies</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 leading-relaxed">
+                        Built completely as a front-end package. Zero databases, server hosting dependencies, or persistent tracking cookies to ensure total privacy.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Target User Profiling Table (PPT 05) -->
+            <div class="mt-20 space-y-8">
+                <div class="text-center max-w-2xl mx-auto space-y-2">
+                    <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">05 | TARGET USERS & BENEFITS</span>
+                    <h2 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Engineered for Creative Professionals</h2>
+                </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                    <th class="p-5 font-extrabold text-sm text-slate-600 dark:text-slate-300">User Archetype</th>
+                                    <th class="p-5 font-extrabold text-sm text-slate-600 dark:text-slate-300">Deliverables Focus</th>
+                                    <th class="p-5 font-extrabold text-sm text-slate-600 dark:text-slate-300">Recommended Aesthetic Style</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs sm:text-sm">
+                                <tr>
+                                    <td class="p-5 font-bold text-slate-800 dark:text-slate-200">Software Developers</td>
+                                    <td class="p-5 text-slate-500 dark:text-slate-400">Database Schemes, Full-Stack Architecture APIs, System Deployment, Bug Audits</td>
+                                    <td class="p-5"><span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-md font-bold text-xs">Obsidian Technical Dark</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-5 font-bold text-slate-800 dark:text-slate-200">Graphic & UX Designers</td>
+                                    <td class="p-5 text-slate-500 dark:text-slate-400">Wireframes, High-Fidelity Prototypes, Vector Layout Handouts, Visual Style Systems</td>
+                                    <td class="p-5"><span class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 rounded-md font-bold text-xs">Corporate Blue Minimal</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-5 font-bold text-slate-800 dark:text-slate-200">Copywriters & Marketers</td>
+                                    <td class="p-5 text-slate-500 dark:text-slate-400">SEO Writing, Landing Page Copy, Social Growth Strategies, Commercial Ad Frameworks</td>
+                                    <td class="p-5"><span class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-md font-bold text-xs">Prestige Gold Executive</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-5 font-bold text-slate-800 dark:text-slate-200">Video & Motion Animators</td>
+                                    <td class="p-5 text-slate-500 dark:text-slate-400">Post Production, Commercial Color Grading, Sound FX Mixing, 3D Assets</td>
+                                    <td class="p-5"><span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-md font-bold text-xs">Obsidian Technical Dark</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: TECH STACK & SYSTEM SPECS (PPT 06) -->
+        <section id="page-techstack" class="page-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">06 | SYSTEM TECH STACK</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Front-End Architecture Core</h2>
+                <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400">Zero database footprint, ensuring complete data security and fast loading times.</p>
+            </div>
+
+            <!-- Modern Tech Layout Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Tech 1 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between h-60">
+                    <div class="space-y-3">
+                        <div class="text-orange-500 text-3xl"><i class="fa-brands fa-html5"></i></div>
+                        <h3 class="text-base font-bold text-slate-950 dark:text-white">HTML5 Layout</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">Provides semantic markup foundation, validated text input schemas, and reliable user accessibility controls.</p>
+                    </div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Markup Schema</span>
+                </div>
+                <!-- Tech 2 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between h-60">
+                    <div class="space-y-3">
+                        <div class="text-blue-500 text-3xl"><i class="fa-brands fa-css3-alt"></i></div>
+                        <h3 class="text-base font-bold text-slate-950 dark:text-white">Tailwind Styling</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">Lightweight CSS custom values and utility parameters that scale to support smooth, responsive layout rendering.</p>
+                    </div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Styling & Grid</span>
+                </div>
+                <!-- Tech 3 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between h-60">
+                    <div class="space-y-3">
+                        <div class="text-yellow-500 text-3xl"><i class="fa-brands fa-js"></i></div>
+                        <h3 class="text-base font-bold text-slate-950 dark:text-white">Vanilla JS Core</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">Handles dynamic form values, active step switches, real-time calculator math, and template themes natively.</p>
+                    </div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Logic Handlers</span>
+                </div>
+                <!-- Tech 4 -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between h-60">
+                    <div class="space-y-3">
+                        <div class="text-indigo-500 text-3xl"><i class="fa-solid fa-gears"></i></div>
+                        <h3 class="text-base font-bold text-slate-950 dark:text-white">jsPDF Compilation</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">Leverages front-end jsPDF coordinate matrices to render precise vector PDF elements directly in the browser.</p>
+                    </div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">PDF Generation</span>
+                </div>
+            </div>
+
+            <!-- Future Roadmap Enhancements (PPT 07) -->
+            <div class="mt-16 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-6">
+                <div>
+                    <span class="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest">07 | FUTURE ROADMAP & ENHANCEMENTS</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">Application Scope Expansion</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="border border-slate-100 dark:border-slate-800 p-5 rounded-xl space-y-2">
+                        <span class="text-brand-500 text-xs font-extrabold uppercase tracking-widest">Phase 1</span>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Premium Paid Templates</h4>
+                        <p class="text-xs text-slate-400">Introduce premium multi-page legal templates and stylized agreements for complex enterprise project deals.</p>
+                    </div>
+                    <div class="border border-slate-100 dark:border-slate-800 p-5 rounded-xl space-y-2">
+                        <span class="text-brand-500 text-xs font-extrabold uppercase tracking-widest">Phase 2</span>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Secure Cloud Storage</h4>
+                        <p class="text-xs text-slate-400">Offer lightweight login systems to allow users to securely store, modify, and duplicate generated client agreements.</p>
+                    </div>
+                    <div class="border border-slate-100 dark:border-slate-800 p-5 rounded-xl space-y-2">
+                        <span class="text-brand-500 text-xs font-extrabold uppercase tracking-widest">Phase 3</span>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Direct Email Dispatch</h4>
+                        <p class="text-xs text-slate-400">Connect API hooks to allow users to email finalized PDF proposals and contracts to clients directly from the application.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aptech Vision Acknowledgment Box -->
+            <div class="mt-16 p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-brand-900 to-indigo-900 text-white relative overflow-hidden shadow-2xl">
+                <!-- Background visual elements -->
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_40%)]"></div>
+                <div class="relative space-y-6 max-w-3xl">
+                    <span class="inline-block px-3 py-1 bg-white/10 border border-white/20 text-brand-200 text-xs font-semibold rounded-full uppercase tracking-wider">APTECH VISION 2026 Showcase</span>
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight leading-tight">Web Development Department Senior Final Project</h2>
+                    <p class="text-brand-200 text-base sm:text-lg leading-relaxed">
+                        This web application serves as our final project submission, demonstrating standard HTML5 form logic, Tailwind CSS setups, and vanilla front-end JavaScript mechanics.
+                    </p>
+                    <div class="flex flex-wrap gap-8 pt-4 text-xs font-bold uppercase tracking-widest text-slate-300">
+                        <div>
+                            <span class="block text-white text-lg font-black">2026</span>
+                            <span>Project Year</span>
+                        </div>
+                        <div>
+                            <span class="block text-white text-lg font-black">Vanilla JS</span>
+                            <span>Development Stack</span>
+                        </div>
+                        <div>
+                            <span class="block text-white text-lg font-black">100% Static</span>
+                            <span>Deployment State</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Professional Consolidated Footer -->
+    <footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center space-x-3">
+                <div class="h-8 w-8 rounded-lg bg-slate-900 dark:bg-white flex items-center justify-center text-white dark:text-slate-900">
+                    <i class="fa-solid fa-file-signature text-sm"></i>
+                </div>
+                <span class="text-sm font-extrabold text-slate-800 dark:text-white">ProposalCraft • Aptech Vision 2026</span>
+            </div>
+            <p class="text-xs text-slate-400 dark:text-slate-500 text-center md:text-left max-w-md">
+                Generated entirely within the client application. All mockup logic and systems are styled for senior educational submission.
+            </p>
+            <div class="flex space-x-4 text-xs font-bold text-slate-400">
+                <button onclick="switchPage('home')" class="hover:text-slate-900 dark:hover:text-white transition-colors">Back to Top</button>
+                <span>|</span>
+                <button onclick="switchPage('generator')" class="hover:text-slate-900 dark:hover:text-white transition-colors">Proposal Generator</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripting Logic (Vanilla JS + PDF Layout Construction) -->
+    <script>
+        // Global variables state (Extended to 5 steps to include Contract terms step)
+        let currentStep = 1;
+        let selectedTemplateStyle = 'minimal';
+
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon text-lg';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-lg';
+            }
+        }
+
+        // Mobile Navigation Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            menu.classList.toggle('hidden');
+            icon.className = menu.classList.contains('hidden') ? 'fa-solid fa-bars text-lg' : 'fa-solid fa-xmark text-lg';
+        }
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            menu.classList.add('hidden');
+            icon.className = 'fa-solid fa-bars text-lg';
+        }
+
+        // Single-Page-App Switch Tabs
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            // Show requested page
+            document.getElementById('page-' + pageId).classList.add('active');
+
+            // Reset navbar navigation buttons active class
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+            });
+
+            const activeBtn = document.getElementById('nav-' + pageId);
+            if (activeBtn) {
+                activeBtn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-white shadow-sm";
+            }
+
+            // Scroll back to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Interactive Pricing & Time Savings Calculator Formula
+        function calculateSavings() {
+            const count = parseInt(document.getElementById('calc-count').value);
+            const rate = parseInt(document.getElementById('calc-rate').value);
+
+            // Update UI slider value labels
+            document.getElementById('calc-count-val').innerText = `${count} Proposals`;
+            document.getElementById('calc-rate-val').innerText = `$${rate} / hr`;
+
+            // Calculate saving metrics
+            const monthlyHoursSaved = count * 2;
+            const yearlyHoursSaved = Math.round(monthlyHoursSaved * 11); // estimate 11 months
+            const moneySavedYearly = yearlyHoursSaved * rate;
+
+            // Render calculation output values
+            document.getElementById('saved-hours').innerText = `${yearlyHoursSaved} Hours`;
+            document.getElementById('saved-money').innerText = `$${moneySavedYearly.toLocaleString()} / yr`;
+        }
+
+        // Live Wizard Steps Flow (Optimized for 5 Steps)
+        function wizardStep(increment) {
+            const targetStep = currentStep + increment;
+            if (targetStep < 1 || targetStep > 5) return;
+
+            // Toggle step visibility classes
+            document.getElementById(`step-content-${currentStep}`).classList.add('hidden');
+            document.getElementById(`step-content-${targetStep}`).classList.remove('hidden');
+
+            currentStep = targetStep;
+
+            // Adjust form wizard step button states
+            document.getElementById('step-indicator').innerText = `Step ${currentStep} of 5`;
+            
+            // Back navigation state
+            const prevBtn = document.getElementById('prev-btn');
+            if (currentStep === 1) {
+                prevBtn.disabled = true;
+                prevBtn.className = "px-4 py-2 text-sm font-bold rounded-xl text-slate-400 dark:text-slate-500 cursor-not-allowed transition-colors";
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.className = "px-4 py-2 text-sm font-bold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors";
+            }
+
+            // Next / Final Submit navigation state
+            const nextBtn = document.getElementById('next-btn');
+            if (currentStep === 5) {
+                nextBtn.innerHTML = `<span>Generate & Download</span> <i class="fa-solid fa-file-arrow-down text-xs"></i>`;
+                nextBtn.onclick = function() { downloadProposalPDF(); };
+            } else {
+                nextBtn.innerHTML = `<span>Next Step</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+                nextBtn.onclick = function() { wizardStep(1); };
+            }
+
+            // Update step navigation dot colors
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= currentStep) {
+                    dot.className = "h-1.5 flex-1 bg-brand-600 rounded-full transition-all duration-300";
+                } else {
+                    dot.className = "h-1.5 flex-1 bg-slate-200 dark:bg-slate-800 rounded-full transition-all duration-300";
+                }
+            }
+        }
+
+        // Dynamic Scope Items Logic
+        function addScopeItem() {
+            const container = document.getElementById('scope-items-container');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "flex items-center space-x-2";
+            itemDiv.innerHTML = `
+                <input type="text" placeholder="Describe this custom phase deliverable..." oninput="updateLivePreview()" class="scope-input flex-grow bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500">
+                <button onclick="removeScopeItem(this)" class="p-2 text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+            `;
+            container.appendChild(itemDiv);
+            updateLivePreview();
+        }
+
+        function removeScopeItem(button) {
+            const container = document.getElementById('scope-items-container');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+                updateLivePreview();
+            }
+        }
+
+        // Toggle Contract Display inside Real-time Preview Container
+        function toggleContractPreview() {
+            const isChecked = document.getElementById('contract-toggle').checked;
+            const previewContractSec = document.getElementById('preview-contract-section');
+            const inputsWrapper = document.getElementById('contract-inputs-wrapper');
+            
+            if (isChecked) {
+                previewContractSec.classList.remove('hidden');
+                inputsWrapper.style.opacity = '1';
+                inputsWrapper.style.pointerEvents = 'auto';
+            } else {
+                previewContractSec.classList.add('hidden');
+                inputsWrapper.style.opacity = '0.4';
+                inputsWrapper.style.pointerEvents = 'none';
+            }
+        }
+
+        // Select styling template
+        function selectTemplate(styleName) {
+            selectedTemplateStyle = styleName;
+
+            // Reset template choices elements styling
+            document.querySelectorAll('.template-choice').forEach(el => {
+                el.className = "template-choice border border-slate-200 dark:border-slate-800 p-4 rounded-xl cursor-pointer hover:border-brand-500 transition-all flex items-center space-x-4";
+                const radioDot = el.querySelector('div:first-child');
+                radioDot.className = "h-5 w-5 rounded-full border-2 border-slate-300 flex items-center justify-center bg-white";
+                radioDot.innerHTML = '';
+            });
+
+            // Set active selection layout style state
+            const targetChoice = event.currentTarget;
+            targetChoice.className = "template-choice border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-900/10 p-4 rounded-xl cursor-pointer hover:border-brand-500 transition-all flex items-center space-x-4";
+            const radioDot = targetChoice.querySelector('div:first-child');
+            radioDot.className = "h-5 w-5 rounded-full border-4 border-brand-600 flex items-center justify-center bg-white";
+
+            updateLivePreview();
+        }
+
+        // Update Paper Live Preview Section
+        function updateLivePreview() {
+            // Read active text form values
+            const fName = document.getElementById('f-name').value || 'Your Name';
+            const fTitle = document.getElementById('f-title').value || 'Your Profession';
+            const fEmail = document.getElementById('f-email').value || 'hello@freelancer.com';
+            const cName = document.getElementById('c-name').value || 'Client Representative';
+            const pTitle = document.getElementById('p-title').value || 'Project Title Scope';
+            const pDesc = document.getElementById('p-desc').value || 'Provide a concise overview description of your project scope objectives...';
+            const pPrice = document.getElementById('p-price').value || '0.00';
+            const pDeadline = document.getElementById('p-deadline').value || 'To Be Arranged';
+
+            // Contract specific parameters
+            const cJurisdiction = document.getElementById('contract-jurisdiction').value || ' Karachi, Sindh, Pakistan';
+            const cPayment = document.getElementById('contract-payment').value || '50% advance, 50% upon delivery';
+            const cIpSelect = document.getElementById('contract-ip');
+            const cIpText = cIpSelect.options[cIpSelect.selectedIndex].text;
+
+            // Sync visual text elements inside document paper preview
+            document.getElementById('preview-f-name').innerText = fName;
+            document.getElementById('preview-f-title').innerText = fTitle;
+            document.getElementById('preview-f-email').innerText = fEmail;
+            document.getElementById('preview-c-name').innerText = cName;
+            document.getElementById('preview-p-title').innerText = pTitle;
+            document.getElementById('preview-p-desc').innerText = pDesc;
+            document.getElementById('preview-p-price').innerText = `$${pPrice} USD`;
+            document.getElementById('preview-p-deadline').innerText = pDeadline;
+
+            // Sync Contract preview parameters
+            document.getElementById('preview-contract-payment').innerText = cPayment;
+            document.getElementById('preview-contract-ip').innerText = cIpText;
+            document.getElementById('preview-contract-jurisdiction').innerText = cJurisdiction;
+            document.getElementById('preview-sig-f').innerText = fName;
+            
+            // Clean client representative name for visual signature
+            const commaIndex = cName.indexOf(',');
+            const formattedCName = commaIndex !== -1 ? cName.substring(0, commaIndex) : cName;
+            document.getElementById('preview-sig-c').innerText = formattedCName;
+
+            // Sync dynamic scope items list inside document preview
+            const previewScopeList = document.getElementById('preview-scope-list');
+            previewScopeList.innerHTML = '';
+            document.querySelectorAll('.scope-input').forEach(input => {
+                if (input.value.trim() !== '') {
+                    const li = document.createElement('li');
+                    li.className = "flex items-start space-x-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300";
+                    li.innerHTML = `<i class="fa-solid fa-circle-check text-brand-600 mt-1"></i> <span>${input.value}</span>`;
+                    previewScopeList.appendChild(li);
+                }
+            });
+
+            // Apply specific template themes colors visually
+            const previewPaper = document.getElementById('live-proposal-preview');
+            const previewBadge = document.getElementById('preview-logo-badge');
+            const previewPrice = document.getElementById('preview-p-price');
+            const previewFTitle = document.getElementById('preview-f-title');
+
+            if (selectedTemplateStyle === 'minimal') {
+                previewPaper.style.backgroundColor = '#ffffff';
+                previewPaper.style.color = '#0f172a';
+                previewBadge.style.backgroundColor = '#4f46e5';
+                previewBadge.style.color = '#ffffff';
+                previewPrice.style.color = '#4f46e5';
+                previewFTitle.style.color = '#4f46e5';
+                document.querySelectorAll('#preview-scope-list i').forEach(icon => icon.style.color = '#4f46e5');
+            } else if (selectedTemplateStyle === 'obsidian') {
+                previewPaper.style.backgroundColor = '#0f172a';
+                previewPaper.style.color = '#f1f5f9';
+                previewBadge.style.backgroundColor = '#10b981';
+                previewBadge.style.color = '#0f172a';
+                previewPrice.style.color = '#10b981';
+                previewFTitle.style.color = '#10b981';
+                document.getElementById('preview-f-name').style.color = '#ffffff';
+                document.getElementById('preview-p-title').style.color = '#ffffff';
+                document.getElementById('preview-c-name').style.color = '#f8fafc';
+                document.getElementById('preview-p-deadline').style.color = '#f8fafc';
+                document.getElementById('preview-p-desc').style.color = '#94a3b8';
+                document.querySelectorAll('#preview-scope-list li').forEach(li => li.style.color = '#cbd5e1');
+                document.querySelectorAll('#preview-scope-list i').forEach(icon => icon.style.color = '#10b981');
+            } else if (selectedTemplateStyle === 'gold') {
+                previewPaper.style.backgroundColor = '#1e1b18';
+                previewPaper.style.color = '#fdfbf7';
+                previewBadge.style.backgroundColor = '#d97706';
+                previewBadge.style.color = '#ffffff';
+                previewPrice.style.color = '#d97706';
+                previewFTitle.style.color = '#d97706';
+                document.getElementById('preview-f-name').style.color = '#ffffff';
+                document.getElementById('preview-p-title').style.color = '#ffffff';
+                document.getElementById('preview-c-name').style.color = '#fefefe';
+                document.getElementById('preview-p-deadline').style.color = '#fefefe';
+                document.getElementById('preview-p-desc').style.color = '#c7c2ba';
+                document.querySelectorAll('#preview-scope-list li').forEach(li => li.style.color = '#e2ded5');
+                document.querySelectorAll('#preview-scope-list i').forEach(icon => icon.style.color = '#d97706');
+            }
+        }
+
+        // Generate and Client-Side Export Vector PDF Proposal & Contract using jsPDF API
+        function downloadProposalPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Gather inputs
+            const fName = document.getElementById('f-name').value || 'Freelancer Name';
+            const fTitle = document.getElementById('f-title').value || 'Profession';
+            const fEmail = document.getElementById('f-email').value || 'contact@freelancer.com';
+            const cName = document.getElementById('c-name').value || 'Client Representative';
+            const pTitle = document.getElementById('p-title').value || 'Project Scope Scope';
+            const pDesc = document.getElementById('p-desc').value || 'Overview details statement...';
+            const pPrice = document.getElementById('p-price').value || '0.00';
+            const pDeadline = document.getElementById('p-deadline').value || 'TBD';
+
+            // Contract specific parameters
+            const includeContract = document.getElementById('contract-toggle').checked;
+            const cJurisdiction = document.getElementById('contract-jurisdiction').value || 'Karachi, Sindh, Pakistan';
+            const cPayment = document.getElementById('contract-payment').value || '50% advance, 50% upon delivery';
+            const cIpSelect = document.getElementById('contract-ip');
+            const cIpText = cIpSelect.options[cIpSelect.selectedIndex].text;
+
+            // Gather work scope array
+            const scopes = [];
+            document.querySelectorAll('.scope-input').forEach(input => {
+                if (input.value.trim() !== '') {
+                    scopes.push(input.value);
+                }
+            });
+
+            // Define template styling colors based on template style state
+            let primaryColor = [79, 70, 229]; // RGB Corporate Blue
+            let secondaryColor = [31, 41, 55];
+            let paperBg = [255, 255, 255];
+            let textPrimary = [15, 23, 42];
+            let textSecondary = [100, 116, 139];
+
+            if (selectedTemplateStyle === 'obsidian') {
+                primaryColor = [16, 185, 129]; // Emerald Accent
+                secondaryColor = [30, 41, 59];
+                paperBg = [15, 23, 42]; // Slate 900 Bg
+                textPrimary = [255, 255, 255];
+                textSecondary = [148, 163, 184];
+            } else if (selectedTemplateStyle === 'gold') {
+                primaryColor = [217, 119, 6]; // Gold Accent
+                secondaryColor = [45, 30, 15];
+                paperBg = [30, 27, 24]; // Luxury Cocoa
+                textPrimary = [255, 255, 255];
+                textSecondary = [199, 194, 186];
+            }
+
+            // --- PAGE 1: PROPOSAL DOCUMENT ---
+            doc.setFillColor(paperBg[0], paperBg[1], paperBg[2]);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            // Draw clean header ribbon background
+            doc.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+            doc.rect(15, 15, 180, 28, 'F');
+
+            // Header brand text layout
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text(fName, 22, 26);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text(fTitle.toUpperCase(), 22, 32);
+
+            // Document meta specifications
+            doc.setTextColor(180, 180, 180);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text("PROPOSAL DOCUMENT", 145, 25);
+            doc.text(`EMAIL: ${fEmail}`, 145, 30);
+            doc.text("DATE: APTECH VISION 2026", 145, 35);
+
+            // Prepared exclusively for text layout
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text("PREPARED EXCLUSIVELY FOR:", 15, 62);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]);
+            doc.text(cName, 15, 68);
+
+            // Project Scope Core Title
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]);
+            const titleLines = doc.splitTextToSize(pTitle, 180);
+            doc.text(titleLines, 15, 82);
+
+            const titleOffset = (titleLines.length * 8) + 80;
+
+            // Description Overview Statement Block
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text("PROJECT OVERVIEW & INTENDED SCOPE:", 15, titleOffset);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+            const descLines = doc.splitTextToSize(pDesc, 180);
+            doc.text(descLines, 15, titleOffset + 6);
+
+            const descOffset = titleOffset + (descLines.length * 5.5) + 12;
+
+            // Scope execution table title block
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text("STIPULATED WORK PHASES & DELIVERABLES:", 15, descOffset);
+
+            // Draw checkmark symbol vectors representation
+            let listY = descOffset + 8;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+
+            scopes.forEach((item) => {
+                doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.setLineWidth(0.4);
+                doc.line(16, listY - 1.5, 18, listY);
+                doc.line(18, listY, 21, listY - 3);
+
+                doc.text(item, 25, listY);
+                listY += 8;
+            });
+
+            // Terms commercial baseline section layout
+            const footerY = 245;
+            doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.setLineWidth(0.5);
+            doc.line(15, footerY, 195, footerY);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+            doc.text("TARGET DELIVERY TIMELINE:", 15, footerY + 8);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]);
+            doc.text(pDeadline, 15, footerY + 15);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+            doc.text("ESTIMATED INVESTMENT RETAINER:", 125, footerY + 8);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text(`$${pPrice} USD`, 125, footerY + 16);
+
+            // --- PAGE 2: CONTRACT AGREEMENT (IF ENABLED) ---
+            if (includeContract) {
+                doc.addPage();
+                
+                // Draw background for Page 2
+                doc.setFillColor(paperBg[0], paperBg[1], paperBg[2]);
+                doc.rect(0, 0, 210, 297, 'F');
+
+                // Header ribbon
+                doc.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+                doc.rect(15, 15, 180, 28, 'F');
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(14);
+                doc.text("COMMERCIAL TERMS AGREEMENT", 22, 28);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.text("SECTION B: BINDING LEGAL FRAMEWORK", 22, 34);
+
+                // Meta Info Right Side top
+                doc.setTextColor(180, 180, 180);
+                doc.setFontSize(8);
+                doc.text("CONTRACT COMPONENT", 145, 27);
+                doc.text(`REF: APTECH-VISION-2026`, 145, 33);
+
+                // Legal intro text block
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9.5);
+                doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+                const contractIntro = `This commercial contract is established mutually between the provider ${fName} ("Freelancer") and the client representative ${cName} ("Client") to define execution terms and billing schedules for the project scope "${pTitle}".`;
+                const wrappedIntro = doc.splitTextToSize(contractIntro, 180);
+                doc.text(wrappedIntro, 15, 60);
+
+                // Formal Clauses
+                let clauseY = 85;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.text("1. WORK SCOPE & PERFORMANCE DELIVERY", 15, clauseY);
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+                const clause1Text = `The Freelancer agrees to perform development, consulting, and associated visual execution targets designated within the "Execution Framework Phases". Any additional requested objectives outside this framework shall require separate invoice evaluations.`;
+                const wrappedClause1 = doc.splitTextToSize(clause1Text, 180);
+                doc.text(wrappedClause1, 15, clauseY + 5);
+
+                // Clause 2
+                clauseY += 28;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.text("2. BILLING SCHEDULE & PROTECTION TERMS", 15, clauseY);
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+                const clause2Text = `Payment terms for this project shall match the scheduled framework: ${cPayment}. Final project files, assets, and source codes shall be withheld until all pending milestone billing statements are paid in full.`;
+                const wrappedClause2 = doc.splitTextToSize(clause2Text, 180);
+                doc.text(wrappedClause2, 15, clauseY + 5);
+
+                // Clause 3
+                clauseY += 28;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.text("3. INTELLECTUAL PROPERTY RIGHTS", 15, clauseY);
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+                const clause3Text = `Intellectual property rights terms are arranged as follows: ${cIpText}. Regardless of selection, Freelancer retains basic self-promotional distribution rights of compiled work elements.`;
+                const wrappedClause3 = doc.splitTextToSize(clause3Text, 180);
+                doc.text(wrappedClause3, 15, clauseY + 5);
+
+                // Clause 4
+                clauseY += 28;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.text("4. DISPUTE SETTLEMENT & JURISDICTION", 15, clauseY);
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+                const clause4Text = `This commercial framework shall be governed, managed, and executed under the local guidelines and legal jurisdiction of ${cJurisdiction}. Any disputes arising shall first be addressed through mutual mediation.`;
+                const wrappedClause4 = doc.splitTextToSize(clause4Text, 180);
+                doc.text(wrappedClause4, 15, clauseY + 5);
+
+                // Signature block
+                const sigY = 220;
+                doc.setDrawColor(textSecondary[0], textSecondary[1], textSecondary[2]);
+                doc.setLineWidth(0.3);
+                
+                // Lines
+                doc.line(15, sigY + 12, 90, sigY + 12);
+                doc.line(115, sigY + 12, 190, sigY + 12);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(8);
+                doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.text("PROVIDER SIGNATURE", 15, sigY + 17);
+                doc.text("CLIENT REPRESENTATIVE SIGNATURE", 115, sigY + 17);
+
+                // Clean names for sign text
+                const commaIndex = cName.indexOf(',');
+                const formattedCName = commaIndex !== -1 ? cName.substring(0, commaIndex) : cName;
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.setTextColor(textPrimary[0], textPrimary[1], textPrimary[2]);
+                doc.text(fName, 15, sigY + 23);
+                doc.text(formattedCName, 115, sigY + 23);
+            }
+
+            // File generation download trigger
+            const sanitizedTitle = pTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            doc.save(`proposal_contract_${sanitizedTitle}.pdf`);
+
+            // Interactive party feedback celebration
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Initialize defaults on boot
+        window.onload = function() {
+            calculateSavings();
+            updateLivePreview();
+        };
+    </script>
+</body>
+</html>
